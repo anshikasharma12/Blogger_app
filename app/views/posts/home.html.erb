@@ -1,0 +1,37 @@
+<span class="bg-dark p-2 text-white fs-3">
+  <i class="fa-solid fa-user-tie pe-2"></i>Admin: <%= @admin_user_email %></span>
+<% if user_signed_in? %>
+<h1 class="mt-2">WELCOME TO THE BLOGGER</h1>
+<h1>Posts</h1>
+
+<ul>
+  <% @posts.each do |post| %>
+  <div class="card ">
+    <div class="card-content ps-3 py-3">
+      <div class="media">
+        <div class="media-content">
+        <%= link_to post.title, post %>  
+
+</div>
+</div>
+<div class="content my-2">
+  <%= post.body %>
+</div>
+<div class="comment-count">
+  <span class="tag is-rounded border bg-light py-1 my-2 px-1"><%= post.comments.count %> comments</span>
+</div>
+<div class="my-3">
+  <span class="tag is-rounded border bg-light py-1 my-4 px-1">
+<%= post.likes.count %> <%= (post.likes.count) == 1 ? 'Like' : 'Likes'%></span></div>
+
+</div>
+</div>
+<% end %>
+  
+</ul>
+<%= link_to "New Post", new_post_path %>
+
+<% else %>
+<h2>Please Sign in or Sign Up First</h2>
+
+<% end %>

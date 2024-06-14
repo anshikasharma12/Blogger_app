@@ -1,0 +1,11 @@
+<% @comments.each do |comment| %>
+  <div id="comment-<%= comment.id %>">
+    <p><%= comment.content %></p>
+    <p>Likes: <span id="likes-count-<%= comment.id %>"><%= comment.likes.count %></span></p>
+    <% if comment.likes.exists?(user: current_user) %>
+      <%= button_to 'Unlike', unlike_comment_path(comment), method: :delete, remote: true, class: 'unlike-button', data: { comment_id: comment.id } %>
+    <% else %>
+      <%= button_to 'Like', like_comment_path(comment), method: :post, remote: true, class: 'like-button', data: { comment_id: comment.id } %>
+    <% end %>
+  </div>
+<% end %>

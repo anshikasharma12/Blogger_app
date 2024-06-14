@@ -1,0 +1,21 @@
+<div class="card my-1 ms-4">
+    <div class="card-body">
+      <p><%= reply.body %></p>
+      <p class="small text-muted">Posted by <%= reply.user.email if reply.user %> at <%= reply.created_at %></p>
+  
+      <%= link_to 'reply', '#', class: 'd-block reply-new', data: { id: reply.id } %>
+  
+      <% pre_like = reply.likes.find { |like| like.user_id == current_user.id } %>
+      <% if pre_like %>
+        <%= button_to 'Unlike', post_comment_like_path(post, reply, pre_like), method: :delete, class: 'btn btn-secondary' %>
+      <% else %>
+        <%= button_to 'Like', post_comment_likes_path(post, reply), method: :post, class: 'btn btn-primary' %>
+      <% end %>
+      <p class="my-2"><%= reply.likes.count %> <%= reply.likes.count == 1 ? 'Like' : 'Likes' %></p>
+  
+      <% if reply.user == current_user %>
+        <%= button_to 'Delete', post_comment_path(post, reply), method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn btn-danger' %>
+      <% end %>
+    </div>
+  </div>
+  

@@ -1,0 +1,50 @@
+<% unless !comment.persisted? %>
+  <div class="card my-1">
+    <div class="card-body">
+      <p><%= comment.body %></p>
+      <p class="small text-muted">Posted by <%= comment.user.email if comment.user %> at <%= comment.created_at %></p>
+      
+      <!-- Ensure the data-id attribute is correctly set to the comment's ID -->
+      <%= link_to 'reply', '#', class: 'd-block reply-new', data: { id: comment.id } %>
+
+      <% pre_like = comment.likes.find { |like| like.user_id == current_user.id } %>
+      <% if pre_like %>
+        <%= button_to 'Unlike', post_comment_like_path(post, comment, pre_like), method: :delete, class: 'btn btn-secondary' %>
+      <% else %>
+        <%= button_to 'Like', post_comment_likes_path(post, comment), method: :post, class: 'btn btn-primary' %>
+      <% end %>
+      <p class="my-2"><%= comment.likes.count %> <%= comment.likes.count == 1 ? 'Like' : 'Likes' %></p>
+      
+      <!-- Delete button for comments -->
+      <% if comment.user == current_user %>
+        <%= button_to 'Delete', post_comment_path(post, comment), method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn btn-danger' %>
+      <% end %>
+
+      <!-- Render replies if any -->
+      <% if comment.replies.any? %>
+        <div class="replies ms-4">
+          <% comment.replies.each do |reply| %>
+            <%= render partial: 'comments/comment', locals: { comment: reply, post: post } %>
+          <% end %>
+        </div>
+      <% end %>
+
+      <!-- Ensure the reply form is associated with the specific comment or reply -->
+      <div id="reply-form-<%= comment.id %>" class="reply-form" style="display: none;">
+        <%= form_with(model: [post, comment.replies.build], local: true) do |f| %>
+          <div class="card ml-5 my-2">
+            <div class="card-body">
+              <%= f.hidden_field :parent_id, value: comment.id %>
+              <div class="form-group">
+                <%= f.label :body, 'Reply' %>
+                <%= f.text_area :body, class: 'form-control' %>
+              </div>
+              <%= f.submit 'Submit', class: 'btn btn-primary' %>
+              <%= link_to 'Cancel', '#', class: 'btn btn-secondary cancel-reply', data: { comment_id: comment.id } %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

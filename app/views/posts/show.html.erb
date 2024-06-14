@@ -1,0 +1,56 @@
+<div class="d-flex">
+  <h1><%= @post.title %></h1>
+  <% if @post.user %>
+    <span class="bg-dark p-2 text-white">User: <%= @post.user.email %></span>
+  <% else %>
+    <span class="bg-dark p-2 text-white">User information not available</span>
+  <% end %>
+
+  <% if current_user.admin? %>
+    <span class="bg-dark p-2 text-white">Admin: <%= current_user.email %></span>
+  <% end %>
+</div>
+
+<p><%= @post.body %></p>
+
+<ul>
+  <li><%= link_to "Edit", edit_post_path(@post) %></li>
+  <li><%= button_to "Destroy", post_path(@post), method: :delete, data: { confirm: "Are you sure?" } %></li>
+  <li><%= link_to 'Back to Posts', root_path %></li>
+  <% pre_like = @post.likes.find { |like| like.user_id == current_user.id } %>
+  <% if pre_like %>
+    <li><%= button_to 'Unlike', post_like_path(@post, pre_like), method: :delete %></li>
+  <% else %>
+    <li><%= button_to 'Like', post_likes_path(@post), method: :post %></li>
+  <% end %>
+  <p class="my-2"><%= @post.likes.count %> <%= @post.likes.count == 1 ? 'Like' : 'Likes' %></p>
+</ul>
+
+<div class="card my-1">
+  <div class="card-body">
+    <p class="font-weight-bold">Comments</p>
+    <%= form_with(model: [@post, @post.comments.build], local: true) do |f| %>
+      <div class="form-group">
+        <%= f.label 'New comment' %>
+        <%= f.text_area :body, class: 'form-control' %>
+      </div>
+      <%= f.submit 'Submit', class: 'btn btn-primary' %>
+    <% end %>
+
+    <!-- Add these lines just after the form, before rendering comments -->
+    <h2>Comments</h2>
+    <% @post.comments.where(parent_id: nil).each do |comment| %>
+      <%= render partial: 'comments/comment', locals: { comment: comment, post: @post } %>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function() {
+    $('.reply-new').on('click', function(e) {
+      e.preventDefault();
+      var id = $(this).data('id');
+      $('#reply-form-' + id).toggle();
+    });
+  });
+</script>

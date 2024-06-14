@@ -1,0 +1,28 @@
+Rails.application.routes.draw do
+  devise_for :users 
+
+  namespace :admin do
+    resources :dashboard
+  end
+  
+  root 'posts#home'
+  get 'posts/about'
+
+  resources :posts do
+    resources :likes, only: [:create, :destroy], defaults: { likeable: 'post' }
+    
+    resources :comments do
+      resources :replies, only: [:new, :create]
+      resources :likes, only: [:create, :destroy], defaults: { likeable: 'comment' }
+    end
+  end
+
+  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
+  # Can be used by load balancers and uptime monitors to verify that the app is live.
+  get "up" => "rails/health#show", as: :rails_health_check
+
+  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+
+  # Defines the root path route ("/")
+  # root "posts#index"
+end
